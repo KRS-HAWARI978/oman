@@ -1,0 +1,938 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kid's Reading Adventure</title>
+    <!-- We're using a fun, handwritten-style font for a friendly feel -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Balsamiq+Sans:wght@400;700&family=Delius&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /*
+        Custom CSS for a playful, kid-friendly look.
+        Using a fun font and background.
+        */
+        body {
+            font-family: 'Delius', sans-serif;
+            background-color: #ffe4e6; /* A soft, playful pink */
+            background-image: url("data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23f9a8d4' fill-opacity='0.4'%3E%3Cpath fill-rule='evenodd' d='M10 0a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm0 18a8 8 0 1 1 0-16 8 8 0 0 1 0 16z'/%3E%3C/g%3E%3C/svg%3E"); /* Simple, cute dot pattern */
+        }
+        h1, h2 {
+            font-family: 'Balsamiq Sans', cursive;
+        }
+        /* Custom styles for bouncy buttons and colorful shadows */
+        .btn-grade, .btn-story, .btn-submit {
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .btn-grade:hover, .btn-story:hover, .btn-submit:hover {
+            transform: scale(1.05) translateY(-3px);
+            box-shadow: 0 12px 20px -5px rgba(0, 0, 0, 0.2);
+        }
+        /* Gradient for grade buttons */
+        .grade-1-bg { background-image: linear-gradient(to right top, #f43f5e, #ec4899); }
+        .grade-2-bg { background-image: linear-gradient(to right top, #fbbf24, #fde047); }
+        .grade-3-bg { background-image: linear-gradient(to right top, #22d3ee, #60a5fa); }
+        .grade-4-bg { background-image: linear-gradient(to right top, #8b5cf6, #c084fc); }
+    </style>
+</head>
+<body class="flex flex-col items-center p-4 min-h-screen">
+
+    <div id="app-container" class="bg-white rounded-3xl shadow-2xl w-full max-w-4xl p-8 md:p-12 my-8">
+
+        <h1 class="text-4xl md:text-5xl font-bold text-center text-purple-600 mb-8 md:mb-12">
+            📚 My Reading Adventure! 📖
+        </h1>
+
+        <div id="home-view" class="view">
+            <h2 class="text-2xl font-semibold text-gray-700 text-center mb-6">Which adventure level will you choose?</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <button onclick="renderStoryList('grade1')" class="btn-grade grade-1-bg text-white font-bold py-8 px-4 rounded-xl shadow-lg text-2xl">Level 1</button>
+                <button onclick="renderStoryList('grade2')" class="btn-grade grade-2-bg text-white font-bold py-8 px-4 rounded-xl shadow-lg text-2xl">Level 2</button>
+                <button onclick="renderStoryList('grade3')" class="btn-grade grade-3-bg text-white font-bold py-8 px-4 rounded-xl shadow-lg text-2xl">Level 3</button>
+                <button onclick="renderStoryList('grade4')" class="btn-grade grade-4-bg text-white font-bold py-8 px-4 rounded-xl shadow-lg text-2xl">Level 4</button>
+            </div>
+        </div>
+
+        <div id="story-list-view" class="view hidden">
+            <div class="flex items-center justify-between mb-6">
+                <button onclick="showView('home-view')" class="text-pink-500 hover:text-pink-700 font-semibold flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd" /></svg>
+                    Back
+                </button>
+                <h2 id="story-list-title" class="text-2xl font-bold text-gray-800 flex-grow text-center">Level Stories</h2>
+            </div>
+            <div id="stories-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                </div>
+        </div>
+
+        <div id="story-view" class="view hidden">
+            <div class="flex items-center justify-between mb-6">
+                <button onclick="showView('story-list-view')" class="text-pink-500 hover:text-pink-700 font-semibold flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd" /></svg>
+                    Back to Stories
+                </button>
+            </div>
+            <!-- Using a more colorful placeholder image -->
+            <img id="story-image" src="https://placehold.co/400x300/fecaca/1f2937?text=Your+Story+Here" alt="A relevant image for the story" class="w-full max-w-sm mx-auto rounded-xl shadow-md mb-6" />
+            
+            <h2 id="story-title" class="text-3xl font-bold text-purple-700 mb-4 text-center"></h2>
+            <div id="story-text" class="bg-gray-100 p-6 rounded-xl shadow-inner mb-8 leading-relaxed text-gray-700">
+                </div>
+            <h3 class="text-2xl font-bold text-gray-800 mb-6 text-center">Questions</h3>
+            <div id="quiz-questions" class="space-y-6">
+                </div>
+            <div class="flex justify-center mt-8">
+                <button onclick="checkAnswers()" class="btn-submit px-8 py-3 bg-green-500 text-white font-bold rounded-full shadow-lg hover:bg-green-600 transition-colors">🚀 Submit My Answers!</button>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // Data structure for all stories and questions
+        const storiesData = {
+            grade1: [
+                {
+                    title: "The Little Green Frog",
+                    text: "A small frog sat on a green lily pad. He saw a fly buzz by. Splash! He jumped and ate the fly for lunch.",
+                    questions: [
+                        { q: "What animal sat on a lily pad?", a: "A frog" },
+                        { q: "What did the frog eat?", a: "A fly" },
+                        { q: "What sound did he make?", a: "Splash" },
+                        { q: "What color was the lily pad?", a: "Green" },
+                        { q: "Where did the frog sit?", a: "On a green lily pad" },
+                        { q: "What did the fly do?", a: "Buzz by" },
+                        { q: "What did the frog do after the fly buzzed by?", a: "He jumped" },
+                        { q: "What was the frog doing when he jumped?", a: "He was eating" },
+                        { q: "What time of day was it?", a: "Lunch time" },
+                        { q: "What two things were on the lily pad?", a: "A frog and a lily pad" }
+                    ]
+                },
+                {
+                    title: "The Red Ball",
+                    text: "A boy played with his red ball. He threw it high in the air. The ball bounced and rolled. It was so much fun.",
+                    questions: [
+                        { q: "What color was the ball?", a: "Red" },
+                        { q: "What did the boy do with the ball?", a: "Threw it" },
+                        { q: "What did the ball do?", a: "Bounced and rolled" },
+                        { q: "What was the boy doing?", a: "Playing" },
+                        { q: "How did the boy feel?", a: "Happy" },
+                        { q: "What went high in the air?", a: "The ball" },
+                        { q: "How did the boy play?", a: "With his red ball" },
+                        { q: "Did the ball stop moving after it was thrown?", a: "No, it bounced and rolled" },
+                        { q: "Who was playing with the ball?", a: "A boy" },
+                        { q: "What did the boy think of the game?", a: "It was so much fun" }
+                    ]
+                },
+                {
+                    title: "The Big Yellow Sun",
+                    text: "The sun was big and yellow. It shined in the sky. It felt warm on my face. It was a beautiful day.",
+                    questions: [
+                        { q: "What color was the sun?", a: "Yellow" },
+                        { q: "Where was the sun?", a: "In the sky" },
+                        { q: "How did the sun feel?", a: "Warm" },
+                        { q: "What was big and yellow?", a: "The sun" },
+                        { q: "What shined in the sky?", a: "The sun" },
+                        { q: "What part of the body felt the sun?", a: "My face" },
+                        { q: "How was the day?", a: "Beautiful" },
+                        { q: "What shined on my face?", a: "The sun" },
+                        { q: "Did the sun feel cold?", a: "No, it felt warm" },
+                        { q: "Who felt the sun?", a: "I did" }
+                    ]
+                },
+                {
+                    title: "My Cat, Whiskers",
+                    text: "My cat, Whiskers, has soft fur. She loves to sleep in the sun. She purrs when I pet her. She is my best friend.",
+                    questions: [
+                        { q: "What is the cat's name?", a: "Whiskers" },
+                        { q: "What does she love to do?", a: "Sleep in the sun" },
+                        { q: "What does she do when you pet her?", a: "Purrs" },
+                        { q: "What does the cat have?", a: "Soft fur" },
+                        { q: "What is the cat to me?", a: "My best friend" },
+                        { q: "Where does she sleep?", a: "In the sun" },
+                        { q: "What is soft?", a: "Her fur" },
+                        { q: "Who pets the cat?", a: "I do" },
+                        { q: "When does she purr?", a: "When I pet her" },
+                        { q: "Who is Whiskers?", a: "My cat" }
+                    ]
+                },
+                {
+                    title: "The Friendly Dog",
+                    text: "I saw a friendly dog. He wagged his tail. He gave me a lick on the hand. He wanted to play.",
+                    questions: [
+                        { q: "How did the dog act?", a: "Friendly" },
+                        { q: "What did the dog do with his tail?", a: "Wagged it" },
+                        { q: "What did he give me?", a: "A lick on the hand" },
+                        { q: "Who saw a friendly dog?", a: "I did" },
+                        { q: "What did the dog want?", a: "To play" },
+                        { q: "What did the dog do with his tail?", a: "Wagged it" },
+                        { q: "What part of my body did he lick?", a: "My hand" },
+                        { q: "What was the dog like?", a: "Friendly" },
+                        { q: "Did the dog seem sad?", a: "No, he seemed friendly" },
+                        { q: "What was the purpose of the lick?", a: "He was being friendly" }
+                    ]
+                },
+                {
+                    title: "The Blue Car",
+                    text: "A fast blue car drove down the street. It went very fast. It made a loud noise. Vroom! It went around the corner.",
+                    questions: [
+                        { q: "What color was the car?", a: "Blue" },
+                        { q: "How did the car go?", a: "Very fast" },
+                        { q: "What sound did it make?", a: "Vroom" },
+                        { q: "Where did the car drive?", a: "Down the street" },
+                        { q: "What was the car like?", a: "Fast and blue" },
+                        { q: "What did the car do after it went fast?", a: "Went around the corner" },
+                        { q: "Was the car slow?", a: "No, it was fast" },
+                        { q: "Did the car make a quiet sound?", a: "No, it made a loud noise" },
+                        { q: "Where did the car go after the street?", a: "Around the corner" },
+                        { q: "What was loud?", a: "The car's noise" }
+                    ]
+                },
+                {
+                    title: "The Apple Tree",
+                    text: "I picked a red apple from the tree. It was very big. It was sweet and yummy. Apples are my favorite.",
+                    questions: [
+                        { q: "What did I pick?", a: "A red apple" },
+                        { q: "How did the apple taste?", a: "Sweet and yummy" },
+                        { q: "What did I pick it from?", a: "The tree" },
+                        { q: "What color was the apple?", a: "Red" },
+                        { q: "How big was the apple?", a: "Very big" },
+                        { q: "What is my favorite fruit?", a: "Apples" },
+                        { q: "Who picked the apple?", a: "I do" },
+                        { q: "What was on the tree?", a: "A red apple" },
+                        { q: "Was the apple small?", a: "No, it was big" },
+                        { q: "What word describes how the apple tasted?", a: "Sweet and yummy" }
+                    ]
+                },
+                {
+                    title: "The Big House",
+                    text: "I saw a big house with a red door. It had many windows. It looked very nice and cozy. I wanted to live there.",
+                    questions: [
+                        { q: "What color was the door?", a: "Red" },
+                        { q: "How many windows did it have?", a: "Many" },
+                        { q: "How did the house look?", a: "Nice and cozy" },
+                        { q: "What did I see?", a: "A big house" },
+                        { q: "What did the big house have?", a: "A red door and many windows" },
+                        { q: "What did I want to do?", a: "Live there" },
+                        { q: "Was the house small?", a: "No, it was big" },
+                        { q: "What was red?", a: "The door" },
+                        { q: "What two words describe the house?", a: "Nice and cozy" },
+                        { q: "Who saw the house?", a: "I did" }
+                    ]
+                },
+                {
+                    title: "The Fluffy Cloud",
+                    text: "A fluffy white cloud floated in the sky. It looked like a sheep. The wind pushed it slowly. It was a happy cloud.",
+                    questions: [
+                        { q: "What color was the cloud?", a: "White" },
+                        { q: "What did the cloud look like?", a: "A sheep" },
+                        { q: "What pushed the cloud?", a: "The wind" },
+                        { q: "How was the cloud described?", a: "Fluffy and white" },
+                        { q: "Where was the cloud?", a: "In the sky" },
+                        { q: "What kind of cloud was it?", a: "A happy cloud" },
+                        { q: "Did the cloud move fast?", a: "No, it moved slowly" },
+                        { q: "What was pushed slowly?", a: "The fluffy white cloud" },
+                        { q: "What looked like a sheep?", a: "The cloud" },
+                        { q: "What floated in the sky?", a: "A fluffy white cloud" }
+                    ]
+                }
+            ],
+            grade2: [
+                {
+                    title: "The Busy Bee",
+                    text: "A little bee named Buzz flew out of his hive. He was looking for bright flowers. He drank nectar from each one. He then flew back to the hive, carrying pollen on his fuzzy legs. His job was to help make honey for the queen and all the other bees.",
+                    questions: [
+                        { q: "What was the bee's name?", a: "Buzz" },
+                        { q: "What did he drink from the flowers?", a: "nectar" },
+                        { q: "What did his job help make?", a: "honey" },
+                        { q: "Who was the honey for?", a: "the queen and all the other bees" },
+                        { q: "What did Buzz carry on his legs?", a: "pollen" },
+                        { q: "Where did Buzz fly out of?", a: "his hive" },
+                        { q: "What was Buzz looking for?", a: "bright flowers" },
+                        { q: "How were his legs described?", a: "fuzzy" },
+                        { q: "What did he do with the pollen?", a: "flew it back to the hive" },
+                        { q: "What did Buzz drink from each flower?", a: "nectar" }
+                    ]
+                },
+                {
+                    title: "The Curious Fox",
+                    text: "Ferdinand the fox was known for being curious. He lived in a burrow at the edge of a great forest. One sunny morning, he decided to explore a part of the forest he had never seen before. He found a shimmering waterfall and a cluster of glowing mushrooms. He went home feeling much wiser.",
+                    questions: [
+                        { q: "What was the fox's name?", a: "Ferdinand" },
+                        { q: "What was Ferdinand known for?", a: "being curious" },
+                        { q: "Where did Ferdinand live?", a: "in a burrow at the edge of a great forest" },
+                        { q: "What did he find on his adventure?", a: "a shimmering waterfall and glowing mushrooms" },
+                        { q: "How did he feel when he went home?", a: "wiser" },
+                        { q: "What kind of morning was it?", a: "A sunny morning" },
+                        { q: "What did he decide to do?", a: "explore a part of the forest" },
+                        { q: "Where was the burrow?", a: "at the edge of a great forest" },
+                        { q: "What was shimmering?", a: "A waterfall" },
+                        { q: "What was glowing?", a: "Mushrooms" }
+                    ]
+                },
+                {
+                    title: "The Magical Treehouse",
+                    text: "Leo and his sister Maya built a treehouse in their backyard. This was no ordinary treehouse. It was magical! When they climbed inside, they could wish for anything. Leo wished for cake. Maya wished for a puppy. They made a promise to only use the magic for fun things.",
+                    questions: [
+                        { q: "Who built the treehouse?", a: "Leo and his sister Maya" },
+                        { q: "Where did they build the treehouse?", a: "in their backyard" },
+                        { q: "What was special about the treehouse?", a: "It was magical" },
+                        { q: "What did Leo wish for?", a: "cake" },
+                        { q: "What did they promise?", a: "only use the magic for fun things" },
+                        { q: "What was the sister's name?", a: "Maya" },
+                        { q: "What kind of treehouse was it?", a: "A magical one" },
+                        { q: "What could they do inside?", a: "Wish for anything" },
+                        { q: "What did Maya wish for?", a: "a puppy" },
+                        { q: "What was the treehouse's magic only for?", a: "fun things" }
+                    ]
+                },
+                {
+                    title: "The Friendly Dragon",
+                    text: "In a cave on a mountain lived a friendly dragon named Sparky. One day, a little boy named Finn got lost. Sparky saw him and gently flew down. Sparky used his warm breath to warm the boy up. Sparky took Finn on his back and flew him safely back to his village.",
+                    questions: [
+                        { q: "What was the dragon's name?", a: "Sparky" },
+                        { q: "Where did Sparky live?", a: "in a cave on a mountain" },
+                        { q: "Who got lost on the mountain?", a: "a little boy named Finn" },
+                        { q: "What did Sparky use his breath for?", a: "to warm the boy up" },
+                        { q: "How did Sparky get Finn back?", a: "He flew him on his back" },
+                        { q: "What kind of dragon was Sparky?", a: "Friendly" },
+                        { q: "Where did Sparky find the boy?", a: "on a mountain" },
+                        { q: "How did Sparky fly down?", a: "Gently" },
+                        { q: "What was the boy's name?", a: "Finn" },
+                        { q: "Where did Sparky take the boy?", a: "back to his village" }
+                    ]
+                },
+                {
+                    title: "The Talking Parrot",
+                    text: "Polly the parrot was very smart. She lived in a large cage in a big house with many books. She loved to hear people read aloud. She learned to repeat many words. Her favorite word was 'cookie.' Whenever anyone came near, she would squawk, 'Polly wants a cookie!' Everyone laughed. She got a cookie every time.",
+                    questions: [
+                        { q: "What animal was Polly?", a: "A parrot" },
+                        { q: "Where did she live?", a: "in a large cage" },
+                        { q: "What did she love to hear?", a: "people read aloud" },
+                        { q: "What was her favorite word?", a: "cookie" },
+                        { q: "What did she get every time she said her favorite word?", a: "a cookie" },
+                        { q: "How did she learn to repeat words?", a: "by hearing people read aloud" },
+                        { q: "What sound did she make?", a: "Squawk" },
+                        { q: "What did everyone do when she talked?", a: "They laughed" },
+                        { q: "How would you describe Polly?", a: "Smart" },
+                        { q: "What would she say when people came near?", a: "Polly wants a cookie" }
+                    ]
+                },
+                {
+                    title: "The Lost Toy",
+                    text: "Lily's favorite toy was a small, fluffy bunny named Cottontail. One day, she couldn't find him anywhere. She looked under her bed, inside her closet, and even in the toy box. She felt very sad. Then, her dad found Cottontail. He had fallen behind the couch! Lily was so happy to have her friend back.",
+                    questions: [
+                        { q: "What was Lily's favorite toy?", a: "a small, fluffy bunny" },
+                        { q: "What was her toy's name?", a: "Cottontail" },
+                        { q: "Where did she look for her toy?", a: "under her bed, in her closet, and in the toy box" },
+                        { q: "How did she feel when she couldn't find him?", a: "very sad" },
+                        { q: "Where did her dad find the toy?", a: "behind the couch" },
+                        { q: "What kind of bunny was Cottontail?", a: "small and fluffy" },
+                        { q: "What did her dad do?", a: "found Cottontail" },
+                        { q: "How did Lily feel after finding the toy?", a: "so happy" },
+                        { q: "What was Cottontail to Lily?", a: "Her friend" },
+                        { q: "What was the final outcome?", a: "She had her friend back" }
+                    ]
+                },
+                {
+                    title: "The Little Blue Bird",
+                    text: "A little blue bird with a bright yellow beak sat on a branch. He sang a happy song to the morning sun. The bird watched the world wake up. The squirrels ran, and the flowers opened. The bird felt happy to be the first one to sing.",
+                    questions: [
+                        { q: "What color was the bird?", a: "Blue" },
+                        { q: "What color was the beak?", a: "Yellow" },
+                        { q: "What did the bird do?", a: "He sang a happy song" },
+                        { q: "What did the bird watch?", a: "the world wake up" },
+                        { q: "How did the bird feel?", a: "Happy" },
+                        { q: "Where did the bird sit?", a: "on a branch" },
+                        { q: "What did the squirrels do?", a: "ran" },
+                        { q: "What did the flowers do?", a: "opened" },
+                        { q: "Who was the first to sing?", a: "The bird" },
+                        { q: "What was the bird's song like?", a: "A happy song" }
+                    ]
+                },
+                {
+                    title: "The Big Picnic",
+                    text: "My family went on a picnic. We brought a big basket of food. We had sandwiches, apples, and juice. We sat on a blanket in the grass. We watched the fluffy clouds float by. We all felt very full and happy after our lunch.",
+                    questions: [
+                        { q: "Where did the family go?", a: "on a picnic" },
+                        { q: "What did they bring?", a: "a big basket of food" },
+                        { q: "What did they have for lunch?", a: "sandwiches, apples, and juice" },
+                        { q: "What did they watch?", a: "fluffy clouds" },
+                        { q: "How did they feel after lunch?", a: "full and happy" },
+                        { q: "What did they sit on?", a: "a blanket in the grass" },
+                        { q: "What was in the basket?", a: "food" },
+                        { q: "What were the clouds like?", a: "fluffy" },
+                        { q: "What floated by?", a: "the fluffy clouds" },
+                        { q: "What meal did they have?", a: "lunch" }
+                    ]
+                },
+                {
+                    title: "The School Bus",
+                    text: "The big yellow school bus came to my stop. The door hissed open. I climbed the steps and found my seat. My friend, Sam, was already there. We talked about our new teacher. The bus started to move and we were on our way to school.",
+                    questions: [
+                        { q: "What color was the bus?", a: "Yellow" },
+                        { q: "What sound did the door make?", a: "Hissed" },
+                        { q: "Who was on the bus?", a: "My friend, Sam" },
+                        { q: "What did they talk about?", a: "their new teacher" },
+                        { q: "Where were they going?", a: "to school" },
+                        { q: "Where did the bus come to?", a: "my stop" },
+                        { q: "What did I do after the door opened?", a: "climbed the steps" },
+                        { q: "Who was my friend?", a: "Sam" },
+                        { q: "How did the door open?", a: "It hissed" },
+                        { q: "What started to move?", a: "The bus" }
+                    ]
+                }
+            ],
+            grade2: [
+                {
+                    title: "The Busy Bee",
+                    text: "A little bee named Buzz flew out of his hive. He was looking for bright flowers. He drank nectar from each one. He then flew back to the hive, carrying pollen on his fuzzy legs. His job was to help make honey for the queen and all the other bees.",
+                    questions: [
+                        { q: "What was the bee's name?", a: "Buzz" },
+                        { q: "What did he drink from the flowers?", a: "nectar" },
+                        { q: "What did his job help make?", a: "honey" },
+                        { q: "Who was the honey for?", a: "the queen and all the other bees" },
+                        { q: "What did Buzz carry on his legs?", a: "pollen" },
+                        { q: "Where did Buzz fly out of?", a: "his hive" },
+                        { q: "What was Buzz looking for?", a: "bright flowers" },
+                        { q: "How were his legs described?", a: "fuzzy" },
+                        { q: "What did he do with the pollen?", a: "flew it back to the hive" },
+                        { q: "What did Buzz drink from each flower?", a: "nectar" }
+                    ]
+                },
+                {
+                    title: "The Curious Fox",
+                    text: "Ferdinand the fox was known for being curious. He lived in a burrow at the edge of a great forest. One sunny morning, he decided to explore a part of the forest he had never seen before. He found a shimmering waterfall and a cluster of glowing mushrooms. He went home feeling much wiser.",
+                    questions: [
+                        { q: "What was the fox's name?", a: "Ferdinand" },
+                        { q: "What was Ferdinand known for?", a: "being curious" },
+                        { q: "Where did Ferdinand live?", a: "in a burrow at the edge of a great forest" },
+                        { q: "What did he find on his adventure?", a: "a shimmering waterfall and glowing mushrooms" },
+                        { q: "How did he feel when he went home?", a: "wiser" },
+                        { q: "What kind of morning was it?", a: "A sunny morning" },
+                        { q: "What did he decide to do?", a: "explore a part of the forest" },
+                        { q: "Where was the burrow?", a: "at the edge of a great forest" },
+                        { q: "What was shimmering?", a: "A waterfall" },
+                        { q: "What was glowing?", a: "Mushrooms" }
+                    ]
+                },
+                {
+                    title: "The Magical Treehouse",
+                    text: "Leo and his sister Maya built a treehouse in their backyard. This was no ordinary treehouse. It was magical! When they climbed inside, they could wish for anything. Leo wished for cake. Maya wished for a puppy. They made a promise to only use the magic for fun things.",
+                    questions: [
+                        { q: "Who built the treehouse?", a: "Leo and his sister Maya" },
+                        { q: "Where did they build the treehouse?", a: "in their backyard" },
+                        { q: "What was special about the treehouse?", a: "It was magical" },
+                        { q: "What did Leo wish for?", a: "cake" },
+                        { q: "What did they promise?", a: "only use the magic for fun things" },
+                        { q: "What was the sister's name?", a: "Maya" },
+                        { q: "What kind of treehouse was it?", a: "A magical one" },
+                        { q: "What could they do inside?", a: "Wish for anything" },
+                        { q: "What did Maya wish for?", a: "a puppy" },
+                        { q: "What was the treehouse's magic only for?", a: "fun things" }
+                    ]
+                },
+                {
+                    title: "The Friendly Dragon",
+                    text: "In a cave on a mountain lived a friendly dragon named Sparky. One day, a little boy named Finn got lost. Sparky saw him and gently flew down. Sparky used his warm breath to warm the boy up. Sparky took Finn on his back and flew him safely back to his village.",
+                    questions: [
+                        { q: "What was the dragon's name?", a: "Sparky" },
+                        { q: "Where did Sparky live?", a: "in a cave on a mountain" },
+                        { q: "Who got lost on the mountain?", a: "a little boy named Finn" },
+                        { q: "What did Sparky use his breath for?", a: "to warm the boy up" },
+                        { q: "How did Sparky get Finn back?", a: "He flew him on his back" },
+                        { q: "What kind of dragon was Sparky?", a: "Friendly" },
+                        { q: "Where did Sparky find the boy?", a: "on a mountain" },
+                        { q: "How did Sparky fly down?", a: "Gently" },
+                        { q: "What was the boy's name?", a: "Finn" },
+                        { q: "Where did Sparky take the boy?", a: "back to his village" }
+                    ]
+                },
+                {
+                    title: "The Talking Parrot",
+                    text: "Polly the parrot was very smart. She lived in a large cage in a big house with many books. She loved to hear people read aloud. She learned to repeat many words. Her favorite word was 'cookie.' Whenever anyone came near, she would squawk, 'Polly wants a cookie!' Everyone laughed. She got a cookie every time.",
+                    questions: [
+                        { q: "What animal was Polly?", a: "A parrot" },
+                        { q: "Where did she live?", a: "in a large cage" },
+                        { q: "What did she love to hear?", a: "people read aloud" },
+                        { q: "What was her favorite word?", a: "cookie" },
+                        { q: "What did she get every time she said her favorite word?", a: "a cookie" },
+                        { q: "How did she learn to repeat words?", a: "by hearing people read aloud" },
+                        { q: "What sound did she make?", a: "Squawk" },
+                        { q: "What did everyone do when she talked?", a: "They laughed" },
+                        { q: "How would you describe Polly?", a: "Smart" },
+                        { q: "What would she say when people came near?", a: "Polly wants a cookie" }
+                    ]
+                },
+                {
+                    title: "The Lost Toy",
+                    text: "Lily's favorite toy was a small, fluffy bunny named Cottontail. One day, she couldn't find him anywhere. She looked under her bed, inside her closet, and even in the toy box. She felt very sad. Then, her dad found Cottontail. He had fallen behind the couch! Lily was so happy to have her friend back.",
+                    questions: [
+                        { q: "What was Lily's favorite toy?", a: "a small, fluffy bunny" },
+                        { q: "What was her toy's name?", a: "Cottontail" },
+                        { q: "Where did she look for her toy?", a: "under her bed, in her closet, and in the toy box" },
+                        { q: "How did she feel when she couldn't find him?", a: "very sad" },
+                        { q: "Where did her dad find the toy?", a: "behind the couch" },
+                        { q: "What kind of bunny was Cottontail?", a: "small and fluffy" },
+                        { q: "What did her dad do?", a: "found Cottontail" },
+                        { q: "How did Lily feel after finding the toy?", a: "so happy" },
+                        { q: "What was Cottontail to Lily?", a: "Her friend" },
+                        { q: "What was the final outcome?", a: "She had her friend back" }
+                    ]
+                },
+                {
+                    title: "The Little Blue Bird",
+                    text: "A little blue bird with a bright yellow beak sat on a branch. He sang a happy song to the morning sun. The bird watched the world wake up. The squirrels ran, and the flowers opened. The bird felt happy to be the first one to sing.",
+                    questions: [
+                        { q: "What color was the bird?", a: "Blue" },
+                        { q: "What color was the beak?", a: "Yellow" },
+                        { q: "What did the bird do?", a: "He sang a happy song" },
+                        { q: "What did the bird watch?", a: "the world wake up" },
+                        { q: "How did the bird feel?", a: "Happy" },
+                        { q: "Where did the bird sit?", a: "on a branch" },
+                        { q: "What did the squirrels do?", a: "ran" },
+                        { q: "What did the flowers do?", a: "opened" },
+                        { q: "Who was the first to sing?", a: "The bird" },
+                        { q: "What was the bird's song like?", a: "A happy song" }
+                    ]
+                },
+                {
+                    title: "The Big Picnic",
+                    text: "My family went on a picnic. We brought a big basket of food. We had sandwiches, apples, and juice. We sat on a blanket in the grass. We watched the fluffy clouds float by. We all felt very full and happy after our lunch.",
+                    questions: [
+                        { q: "Where did the family go?", a: "on a picnic" },
+                        { q: "What did they bring?", a: "a big basket of food" },
+                        { q: "What did they have for lunch?", a: "sandwiches, apples, and juice" },
+                        { q: "What did they watch?", a: "fluffy clouds" },
+                        { q: "How did they feel after lunch?", a: "full and happy" },
+                        { q: "What did they sit on?", a: "a blanket in the grass" },
+                        { q: "What was in the basket?", a: "food" },
+                        { q: "What were the clouds like?", a: "fluffy" },
+                        { q: "What floated by?", a: "the fluffy clouds" },
+                        { q: "What meal did they have?", a: "lunch" }
+                    ]
+                },
+                {
+                    title: "The School Bus",
+                    text: "The big yellow school bus came to my stop. The door hissed open. I climbed the steps and found my seat. My friend, Sam, was already there. We talked about our new teacher. The bus started to move and we were on our way to school.",
+                    questions: [
+                        { q: "What color was the bus?", a: "Yellow" },
+                        { q: "What sound did the door make?", a: "Hissed" },
+                        { q: "Who was on the bus?", a: "My friend, Sam" },
+                        { q: "What did they talk about?", a: "their new teacher" },
+                        { q: "Where were they going?", a: "to school" },
+                        { q: "Where did the bus come to?", a: "my stop" },
+                        { q: "What did I do after the door opened?", a: "climbed the steps" },
+                        { q: "Who was my friend?", a: "Sam" },
+                        { q: "How did the door open?", a: "It hissed" },
+                        { q: "What started to move?", a: "The bus" }
+                    ]
+                }
+            ],
+            grade3: [
+                {
+                    title: "The Ocean Explorer",
+                    text: "Captain Stella was an ocean explorer. Her submarine, the 'Deep Drifter,' could go deeper than any other vessel. She was searching for a new type of bioluminescent fish in the Mariana Trench. The ocean became darker and colder the deeper they went. They passed by strange creatures with glowing bodies and enormous eyes. Suddenly, a swarm of tiny, shimmering fish appeared. Their light was a beautiful, dancing blue. Stella knew she had found what she was looking for. She took careful notes and photographs, making sure not to disturb the delicate ecosystem. They returned to the surface with a new discovery.",
+                    questions: [
+                        { q: "What was the name of the submarine?", a: "Deep Drifter" },
+                        { q: "What was she looking for?", a: "a new type of bioluminescent fish" },
+                        { q: "What happened to the ocean the deeper they went?", a: "it became darker and colder" },
+                        { q: "What did she take to record her findings?", a: "careful notes and photographs" },
+                        { q: "What was special about the fish she found?", a: "Their light was a beautiful, dancing blue" },
+                        { q: "What kind of creatures did they pass by?", a: "strange creatures with glowing bodies and enormous eyes" },
+                        { q: "Where was she searching?", a: "in the Mariana Trench" },
+                        { q: "What appeared suddenly?", a: "a swarm of tiny, shimmering fish" },
+                        { q: "What did she make sure not to disturb?", a: "the delicate ecosystem" },
+                        { q: "What was the final result of the journey?", a: "a new discovery" }
+                    ]
+                },
+                {
+                    title: "The Star Gazing Girl",
+                    text: "Clara loved the night sky. Every evening, she would set up her small telescope in her backyard. She knew all the constellations, but tonight, she was looking for something special: a shooting star. She waited for hours, but the sky was still. Just as she was about to give up, she saw it. A bright streak of light shot across the darkness, leaving a trail of shimmering dust. She gasped in wonder. She made a wish on the star, a secret wish only she and the sky would know. She packed up her telescope, feeling a connection to the vast universe above her.",
+                    questions: [
+                        { q: "What did Clara love?", a: "the night sky" },
+                        { q: "What did she use to look at the sky?", a: "her small telescope" },
+                        { q: "What was she looking for on this night?", a: "a shooting star" },
+                        { q: "What did the shooting star leave behind?", a: "a trail of shimmering dust" },
+                        { q: "What did Clara do when she saw the shooting star?", a: "She gasped in wonder and made a wish" },
+                        { q: "Where did she set up her telescope?", a: "in her backyard" },
+                        { q: "What did she know all about?", a: "the constellations" },
+                        { q: "What shot across the darkness?", a: "a bright streak of light" },
+                        { q: "How did she feel after her experience?", a: "a connection to the vast universe" },
+                        { q: "What did she do with her telescope at the end?", a: "packed it up" }
+                    ]
+                },
+                {
+                    title: "The Mystery of the Missing Book",
+                    text: "Detective Anya was known for solving the most puzzling cases. Her newest case was the 'Mystery of the Missing Book.' The book, a rare edition of 'The Adventures of Alistair,' had vanished from the town library. Anya interviewed the librarian, Mr. Pringle, and the last person to check it out, Mrs. Gable. She looked for clues in the empty space on the shelf. She noticed a faint trace of chocolate on the spine of a neighboring book. Recalling that Mrs. Gable loved to eat chocolate while reading, Anya realized Mrs. Gable must have accidentally taken the book home. Mrs. Gable returned the book, and the case was solved.",
+                    questions: [
+                        { q: "What was the name of the missing book?", a: "The Adventures of Alistair" },
+                        { q: "Where did the book go missing from?", a: "the town library" },
+                        { q: "Who did Anya interview?", a: "Mr. Pringle and Mrs. Gable" },
+                        { q: "What was the key clue she found?", a: "a faint trace of chocolate" },
+                        { q: "How was the case solved?", a: "Mrs. Gable returned the book" },
+                        { q: "What kind of cases did Detective Anya solve?", a: "the most puzzling cases" },
+                        { q: "What was special about the book?", a: "It was a rare edition" },
+                        { q: "What did Anya look for on the shelf?", a: "clues in the empty space" },
+                        { q: "Why did Anya suspect Mrs. Gable?", a: "She knew Mrs. Gable loved to eat chocolate while reading" },
+                        { q: "Who was the librarian?", a: "Mr. Pringle" }
+                    ]
+                },
+                {
+                    title: "The Forest of Giants",
+                    text: "Liam and his dog, Pip, hiked into a forest where the trees were unbelievably tall. The ancient redwoods seemed to touch the clouds, and sunlight filtered through the leaves in golden beams. As they walked, the forest floor was soft with moss. They spotted a tiny mushroom glowing with a faint blue light. Pip barked softly, but Liam shushed him, wanting to protect the magic of the moment. They sat at the base of a great tree, feeling small but connected to the enormous world around them, a beautiful, peaceful feeling.",
+                    questions: [
+                        { q: "What kind of trees were in the forest?", a: "ancient redwoods" },
+                        { q: "What was the forest floor covered with?", a: "soft moss" },
+                        { q: "What did Liam and Pip find?", a: "a tiny mushroom glowing with a faint blue light" },
+                        { q: "How did Liam and Pip feel?", a: "small but connected to the enormous world" },
+                        { q: "What did Liam do when Pip barked?", a: "he shushed him" },
+                        { q: "What was Liam's dog's name?", a: "Pip" },
+                        { q: "What filtered through the leaves?", a: "sunlight" },
+                        { q: "How was the light described?", a: "golden beams" },
+                        { q: "What did they do at the base of a great tree?", a: "They sat" },
+                        { q: "What kind of feeling did they have?", a: "a beautiful, peaceful feeling" }
+                    ]
+                },
+                {
+                    title: "The Chef's Surprise",
+                    text: "Chef Antoine was known for his delicious pastries. But today, he wanted to try something new. He decided to create a dessert that tasted like a summer garden. He mixed together fresh strawberries, sweet basil, and a touch of honey. He layered the mixture between thin, flaky puff pastry. The result was a sweet, savory, and surprising masterpiece. His first customer, a little girl named Rose, took a bite. Her eyes widened in delight. Chef Antoine had made a dish that was truly unique, and she wanted to try another.",
+                    questions: [
+                        { q: "What was Chef Antoine known for?", a: "delicious pastries" },
+                        { q: "What did he want to create?", a: "a dessert that tasted like a summer garden" },
+                        { q: "What ingredients did he use?", a: "fresh strawberries, sweet basil, and honey" },
+                        { q: "What was the result of his cooking?", a: "a sweet, savory, and surprising masterpiece" },
+                        { q: "What was the first customer's name?", a: "Rose" },
+                        { q: "What kind of pastry did he use?", a: "thin, flaky puff pastry" },
+                        { q: "What did the dessert taste like?", a: "a summer garden" },
+                        { q: "How did Rose react to the dessert?", a: "Her eyes widened in delight" },
+                        { q: "What kind of dish did the chef make?", a: "a unique one" },
+                        { q: "What did Rose want to do next?", a: "try another" }
+                    ]
+                },
+                {
+                    title: "The Secret of the Old Map",
+                    text: "Alex found an old, faded map in his grandfather's attic. It showed a path leading to a hidden treasure. The map had strange symbols and a riddle to solve. 'When the moon is new, find the tree with a silver leaf.' Alex studied the map and solved the riddle. He went to the old oak tree in the town square. He dug at its base and found a small, wooden box. Inside was not gold, but a collection of old letters from his grandfather. The true treasure was a story, not a fortune.",
+                    questions: [
+                        { q: "Where did Alex find the old map?", a: "in his grandfather's attic" },
+                        { q: "What did the map show?", a: "a path leading to a hidden treasure" },
+                        { q: "What was the riddle?", a: "'When the moon is new, find the tree with a silver leaf.'" },
+                        { q: "What did he find inside the box?", a: "a collection of old letters from his grandfather" },
+                        { q: "What was the true treasure?", a: "a story, not a fortune" },
+                        { q: "What did the map have on it?", a: "strange symbols and a riddle" },
+                        { q: "What kind of map was it?", a: "old and faded" },
+                        { q: "What kind of box did he find?", a: "a small, wooden box" },
+                        { q: "Where did he go to find the treasure?", a: "the old oak tree in the town square" },
+                        { q: "What did he do at the base of the tree?", a: "He dug" }
+                    ]
+                },
+                {
+                    title: "The Firefighter Hero",
+                    text: "Firefighter Leo heard the alarm ring. A cat was stuck in a tall tree. Leo quickly put on his gear and jumped into the big red truck. He drove to the tree, which was swaying in the wind. Leo carefully climbed the ladder, talking to the scared cat the whole time. He got to the top and gently picked up the cat. He climbed down with the cat safely in his arms. The cat's owner gave Leo a big hug and a thank you. Leo was happy to help.",
+                    questions: [
+                        { q: "What was the emergency?", a: "A cat was stuck in a tall tree" },
+                        { q: "What did Leo drive?", a: "the big red truck" },
+                        { q: "What did Leo use to get to the cat?", a: "a ladder" },
+                        { q: "How did the cat's owner react?", a: "gave Leo a big hug and a thank you" },
+                        { q: "What did Leo do when he got to the cat?", a: "gently picked it up" },
+                        { q: "Who heard the alarm ring?", a: "Firefighter Leo" },
+                        { q: "What was swaying in the wind?", a: "the tall tree" },
+                        { q: "How did Leo climb the ladder?", a: "Carefully" },
+                        { q: "What was Leo doing while climbing?", a: "talking to the cat" },
+                        { q: "How did the cat get down?", a: "Leo climbed down with it in his arms" }
+                    ]
+                },
+                {
+                    title: "The Amazing Robot",
+                    text: "Robbie the robot was amazing. He could do anything! He could clean a room in seconds and even make delicious pancakes for breakfast. One day, a little girl named Ava lost her dog. She was very sad. Robbie used his super-powered sensors to scan the whole neighborhood. In a few minutes, he found the dog hiding in a bush and brought it back to Ava. She gave Robbie a big hug, and he blinked his happy red light. Robbie was a very good helper.",
+                    questions: [
+                        { q: "What could Robbie do?", a: "clean a room and make delicious pancakes" },
+                        { q: "Who lost her dog?", a: "a little girl named Ava" },
+                        { q: "What did Robbie use to find the dog?", a: "his super-powered sensors" },
+                        { q: "Where was the dog hiding?", a: "in a bush" },
+                        { q: "How did Ava thank Robbie?", a: "she gave him a big hug" },
+                        { q: "How would you describe Robbie?", a: "Amazing" },
+                        { q: "What did Robbie do in seconds?", a: "clean a room" },
+                        { q: "How did Ava feel when she lost her dog?", a: "sad" },
+                        { q: "What did Robbie do after finding the dog?", a: "brought it back to Ava" },
+                        { q: "What was the final result of the story?", a: "Ava was happy and Robbie was a good helper" }
+                    ]
+                },
+                {
+                    title: "The School Play",
+                    text: "The whole class was putting on a play about a brave knight. Sam was the knight, and Lily was the dragon. The teacher told everyone to practice their lines. Lily was very nervous. 'What if I forget my lines?' she worried. Her friend Sam told her not to worry. 'Just pretend you're a real dragon,' he said. On the night of the play, Lily roared loudly and remembered all her lines. The audience cheered for her. Lily was so proud of herself, and Sam was a great friend.",
+                    questions: [
+                        { q: "What was the play about?", a: "a brave knight" },
+                        { q: "Who was the knight and who was the dragon?", a: "Sam was the knight, and Lily was the dragon" },
+                        { q: "How did Lily feel?", a: "nervous" },
+                        { q: "What did Sam tell her?", a: "'Just pretend you're a real dragon'" },
+                        { q: "How did Lily feel after the play?", a: "proud of herself" },
+                        { q: "What did the teacher tell the class to do?", a: "practice their lines" },
+                        { q: "What did Lily worry about?", a: "forgetting her lines" },
+                        { q: "What did Lily do on the night of the play?", a: "roared loudly and remembered all her lines" },
+                        { q: "Who cheered for Lily?", a: "The audience" },
+                        { q: "What was the name of the girl who played the dragon?", a: "Lily" }
+                    ]
+                }
+            ],
+            grade4: [
+                {
+                    title: "The Inventor's Workshop",
+                    text: "Elias was an inventor. His workshop was a chaotic but wonderful place, filled with gears, wires, and half-finished contraptions. His current project was a device to capture and bottle the sound of laughter. He believed that laughter was a powerful force that could bring joy to those who were sad. He spent weeks tinkering, adjusting, and testing. One day, while his little sister, Lily, was visiting, she tripped and fell, but instead of crying, she let out a peal of giggles. The device whirred to life, and a golden liquid filled a small glass bottle. He had done it! Elias presented the bottle to his sister, explaining its purpose. They both laughed, creating a new, fresh sound for the next bottle.",
+                    questions: [
+                        { q: "What was Elias's profession?", a: "an inventor" },
+                        { q: "What was his current project?", a: "a device to capture and bottle the sound of laughter" },
+                        { q: "What happened that made the device work?", a: "Lily tripped and giggled" },
+                        { q: "What filled the glass bottle?", a: "a golden liquid" },
+                        { q: "How did he feel when the device worked?", a: "He had done it!" },
+                        { q: "How was his workshop described?", a: "a chaotic but wonderful place" },
+                        { q: "What did he believe laughter could do?", a: "bring joy to those who were sad" },
+                        { q: "Who was visiting the workshop?", a: "his little sister, Lily" },
+                        { q: "What was the purpose of the device?", a: "to bottle the sound of laughter" },
+                        { q: "What did he present to his sister?", a: "the bottle" }
+                    ]
+                },
+                {
+                    title: "The Journey of a River",
+                    text: "The mighty River Verdant began as a tiny trickle high in the snow-capped mountains. As it tumbled down the slopes, it was joined by smaller streams, growing wider and faster. It carved a deep valley through the land, feeding lush forests and providing a home for countless fish and otters. People built towns and cities along its banks, using its power to turn mill wheels and its water for drinking. The river flowed on, a constant, winding presence, until it finally reached the great ocean. It had completed its long journey, changing the land and supporting life along the way, before becoming one with the vast sea.",
+                    questions: [
+                        { q: "Where did the River Verdant begin?", a: "high in the snow-capped mountains" },
+                        { q: "What happened as it tumbled down the slopes?", a: "it was joined by smaller streams" },
+                        { q: "What did the river provide a home for?", a: "countless fish and otters" },
+                        { q: "What did people use the river's power for?", a: "to turn mill wheels" },
+                        { q: "Where did the river's journey end?", a: "in the great ocean" },
+                        { q: "What kind of mountains were they?", a: "snow-capped" },
+                        { q: "What two things did the river become as it went down the slopes?", a: "wider and faster" },
+                        { q: "What did the river carve?", a: "a deep valley" },
+                        { q: "What did people build along the river's banks?", a: "towns and cities" },
+                        { q: "What did the river become one with at the end?", a: "the vast sea" }
+                    ]
+                },
+                {
+                    title: "The History of Chocolate",
+                    text: "The history of chocolate is a long and fascinating one. It began thousands of years ago in ancient Mesoamerica, where the cacao tree was first cultivated. The Aztecs and Mayans revered the cacao bean, using it to create a bitter, spicy drink. It was a drink of the gods, reserved for royalty and sacred rituals. When explorers brought cacao beans to Europe, it was transformed. Sugar and other spices were added, making it a sweet treat. It became popular among the wealthy, and eventually, the process of making solid chocolate was invented. Today, chocolate is a beloved food enjoyed all over the world, a sweet reminder of its rich and ancient past.",
+                    questions: [
+                        { q: "Where did the history of chocolate begin?", a: "in ancient Mesoamerica" },
+                        { q: "What did the Aztecs and Mayans do with the cacao bean?", a: "They used it to create a bitter, spicy drink" },
+                        { q: "What was added to cacao in Europe to change it?", a: "sugar and other spices" },
+                        { q: "Who was the first to enjoy chocolate in Europe?", a: "the wealthy" },
+                        { q: "What was eventually invented in Europe?", a: "the process of making solid chocolate" },
+                        { q: "What tree was first cultivated in Mesoamerica?", a: "the cacao tree" },
+                        { q: "What did the Aztecs and Mayans think of the cacao bean?", a: "They revered it" },
+                        { q: "What was the drink of the gods reserved for?", a: "royalty and sacred rituals" },
+                        { q: "What is chocolate today?", a: "a beloved food" },
+                        { q: "What is chocolate a reminder of?", a: "its rich and ancient past" }
+                    ]
+                },
+                {
+                    title: "The Brave Knight's Quest",
+                    text: "Sir Reginald was the bravest knight in the kingdom. He was tasked by the king to find the legendary Sunstone, which was said to bring warmth and life to the coldest lands. His journey took him through the Whispering Woods, past the treacherous Dragon's Peak, and across the vast Desert of Echoes. Along the way, he helped a lost traveler, outsmarted a grumpy troll, and befriended a wise old owl who guided him. He found the Sunstone in a cave, not guarded by a monster, but resting peacefully on a bed of glowing crystals. He returned with the Sunstone, bringing light to the kingdom.",
+                    questions: [
+                        { q: "What was the knight's name?", a: "Sir Reginald" },
+                        { q: "What was he looking for?", a: "the legendary Sunstone" },
+                        { q: "What did the Sunstone do?", a: "bring warmth and life to the coldest lands" },
+                        { q: "Who did he befriend on his journey?", a: "a wise old owl" },
+                        { q: "Where did he find the Sunstone?", a: "in a cave on a bed of glowing crystals" },
+                        { q: "What was his journey's task?", a: "to find the legendary Sunstone" },
+                        { q: "What were some places he traveled through?", a: "Whispering Woods, Dragon's Peak, Desert of Echoes" },
+                        { q: "What was the owl's role?", a: "it guided him" },
+                        { q: "What was the Sunstone resting on?", a: "a bed of glowing crystals" },
+                        { q: "What did Sir Reginald bring back to the kingdom?", a: "light" }
+                    ]
+                },
+                {
+                    title: "The Space Explorer",
+                    text: "Astronaut Leo climbed into his spaceship, the 'Cosmic Wanderer.' His mission was to explore a newly discovered planet. The planet, named 'Xylos,' was a beautiful swirl of green and blue from a distance. As he got closer, he saw glowing mushroom-like plants and rivers of liquid silver. He landed and carefully stepped out, his boots crunching on a soft, crystalline ground. He took a sample of the silver river and a small piece of a glowing plant. The air smelled fresh and clean. He knew this would be a great discovery for the people on Earth. He felt both small and full of awe in the vast silence of space.",
+                    questions: [
+                        { q: "What was the spaceship's name?", a: "Cosmic Wanderer" },
+                        { q: "What was the mission?", a: "to explore a newly discovered planet" },
+                        { q: "What was the new planet's name?", a: "Xylos" },
+                        { q: "What did he collect?", a: "a sample of the silver river and a piece of a glowing plant" },
+                        { q: "How did he feel?", a: "both small and full of awe" },
+                        { q: "What color was the planet from a distance?", a: "a beautiful swirl of green and blue" },
+                        { q: "What did his boots crunch on?", a: "a soft, crystalline ground" },
+                        { q: "What did the air smell like?", a: "fresh and clean" },
+                        { q: "What two things did he see as he got closer?", a: "glowing mushroom-like plants and rivers of liquid silver" },
+                        { q: "Who was the great discovery for?", a: "the people on Earth" }
+                    ]
+                },
+                {
+                    title: "The Artist's Dream",
+                    text: "Isla was an artist who painted with light. She used a special brush that captured sunlight and moonlight, then painted on a canvas that glowed in the dark. One night, she dreamed of a city made of stars. When she woke, she hurried to her studio and began to paint. She painted tall, shimmering buildings, streets paved with stardust, and people made of constellations. The painting pulsed with a soft, warm light. It was her most beautiful work yet, a perfect reflection of her dream. She hung the canvas on her wall, and every night, she could look at her own city of stars.",
+                    questions: [
+                        { q: "What did Isla paint with?", a: "light" },
+                        { q: "What did she use to paint?", a: "a special brush that captured sunlight and moonlight" },
+                        { q: "What did she dream of?", a: "a city made of stars" },
+                        { q: "What did she paint in her dream city?", a: "tall, shimmering buildings and streets paved with stardust" },
+                        { q: "What did her painting do?", a: "pulsed with a soft, warm light" },
+                        { q: "What was Isla's profession?", a: "an artist" },
+                        { q: "What was special about her canvas?", a: "It glowed in the dark" },
+                        { q: "Where did she paint?", a: "in her studio" },
+                        { q: "How were the people in her painting described?", a: "made of constellations" },
+                        { q: "How did she feel about her painting?", a: "It was her most beautiful work yet" }
+                    ]
+                },
+                {
+                    title: "The Grand Library",
+                    text: "Leo loved books more than anything. His favorite place was the Grand Library, a massive building with towering shelves that reached the ceiling. Every book had a story waiting to be told. The library also had a special secret: some books would whisper their first lines to you if you listened closely. Leo would walk the quiet aisles, closing his eyes, and listen for the whispers. One day, a book about a dragon whispered, 'A great beast stirs in the mountains.' Leo checked it out and hurried home, excited to read the whole story.",
+                    questions: [
+                        { q: "What was Leo's favorite place?", a: "the Grand Library" },
+                        { q: "What was special about some of the books?", a: "they would whisper their first lines" },
+                        { q: "What did Leo do in the library?", a: "walked the aisles, closing his eyes, and listened" },
+                        { q: "What did a book about a dragon whisper?", a: "'A great beast stirs in the mountains'" },
+                        { q: "What did Leo do after hearing the whisper?", a: "he checked it out and hurried home" },
+                        { q: "What did Leo love more than anything?", a: "books" },
+                        { q: "What kind of building was the library?", a: "massive" },
+                        { q: "What did the shelves reach?", a: "the ceiling" },
+                        { q: "What was waiting to be told in every book?", a: "a story" },
+                        { q: "How did Leo feel when he hurried home?", a: "excited" }
+                    ]
+                },
+                {
+                    title: "The Time Traveler's Clock",
+                    text: "Professor Chronos had invented a time-traveling clock. It didn't send him through time, but it could show him glimpses of the past and future. The clock had no numbers, only swirling colors and shifting images. He used it to see what the world was like long ago and to guess what it might be like one hundred years from now. One day, the clock showed him a picture of his childhood home, but with a strange, new tree in the garden. He smiled, knowing that his future self had a beautiful new plant to look forward to.",
+                    questions: [
+                        { q: "What had Professor Chronos invented?", a: "a time-traveling clock" },
+                        { q: "What could the clock show him?", a: "glimpses of the past and future" },
+                        { q: "What did the clock have instead of numbers?", a: "swirling colors and shifting images" },
+                        { q: "What did the clock show him about his childhood home?", a: "a strange, new tree in the garden" },
+                        { q: "How did he feel after seeing the new tree?", a: "happy and hopeful" },
+                        { q: "What was the name of the inventor?", a: "Professor Chronos" },
+                        { q: "What could the clock not do?", a: "send him through time" },
+                        { q: "What two things did he use the clock for?", a: "to see the past and guess the future" },
+                        { q: "What was in the garden?", a: "a strange, new tree" },
+                        { q: "Who did he know was looking forward to the tree?", a: "his future self" }
+                    ]
+                },
+                {
+                    title: "The Magical Bakery",
+                    text: "Elara’s bakery was not ordinary; her cakes and cookies could grant wishes. To make a wish, you had to eat a treat and wish on a shooting star. One day, a young boy named Milo came in, looking very sad. He wished for his lost toy dinosaur to come home. Elara gave him a stardust cookie. That night, as he ate the cookie, he wished on a bright shooting star. The next morning, his dog, Rex, walked in with the dinosaur in his mouth. Milo was so happy. Elara was happy, too, knowing she brought joy to the boy and his family.",
+                    questions: [
+                        { q: "What was special about Elara’s bakery?", a: "her cakes and cookies could grant wishes" },
+                        { q: "How do you make a wish with her treats?", a: "eat one and wish on a shooting star" },
+                        { q: "What was Milo's wish?", a: "for his lost toy dinosaur to come home" },
+                        { q: "What treat did Elara give him?", a: "a stardust cookie" },
+                        { q: "How was his wish granted?", a: "his dog brought the dinosaur to him" },
+                        { q: "What was the boy's name?", a: "Milo" },
+                        { q: "How did Milo look when he came in?", a: "very sad" },
+                        { q: "What was the dog's name?", a: "Rex" },
+                        { q: "How did Milo feel when the dinosaur came back?", a: "so happy" },
+                        { q: "What did Elara know she brought to the boy?", a: "joy" }
+                    ]
+                }
+            ],
+        };
+
+        let currentGrade = null;
+        let currentStoryIndex = null;
+        let currentAnswers = [];
+
+        function showView(viewId) {
+            document.querySelectorAll('.view').forEach(view => {
+                view.classList.add('hidden');
+            });
+            document.getElementById(viewId).classList.remove('hidden');
+        }
+
+        function renderStoryList(grade) {
+            currentGrade = grade;
+            const storyListTitle = document.getElementById('story-list-title');
+            storyListTitle.textContent = `Level ${grade.replace('grade', '')} Stories`;
+            
+            const storiesGrid = document.getElementById('stories-grid');
+            storiesGrid.innerHTML = '';
+            
+            storiesData[grade].forEach((story, index) => {
+                const button = document.createElement('button');
+                button.className = 'btn-story bg-white text-gray-800 font-bold p-4 rounded-xl shadow-lg text-lg text-left transition-transform duration-200 ease-in-out';
+                button.textContent = story.title;
+                button.onclick = () => renderStory(grade, index);
+                storiesGrid.appendChild(button);
+            });
+            
+            showView('story-list-view');
+        }
+
+        function renderStory(grade, index) {
+            currentStoryIndex = index;
+            const story = storiesData[grade][index];
+            
+            document.getElementById('story-title').textContent = story.title;
+            document.getElementById('story-text').textContent = story.text;
+            
+            const quizQuestions = document.getElementById('quiz-questions');
+            quizQuestions.innerHTML = '';
+            
+            story.questions.forEach((q, qIndex) => {
+                const questionContainer = document.createElement('div');
+                questionContainer.className = 'space-y-2';
+                
+                const questionText = document.createElement('p');
+                questionText.className = 'font-semibold text-lg text-gray-700';
+                questionText.textContent = `${qIndex + 1}. ${q.q}`;
+                
+                const answerInput = document.createElement('input');
+                answerInput.type = 'text';
+                answerInput.id = `q-${qIndex}`;
+                answerInput.className = 'w-full p-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-purple-500';
+                answerInput.placeholder = 'Type your answer here...';
+                
+                questionContainer.appendChild(questionText);
+                questionContainer.appendChild(answerInput);
+                quizQuestions.appendChild(questionContainer);
+            });
+            
+            showView('story-view');
+        }
+        
+        function checkAnswers() {
+            const story = storiesData[currentGrade][currentStoryIndex];
+            const quizQuestions = document.getElementById('quiz-questions');
+            let correctCount = 0;
+            
+            story.questions.forEach((q, qIndex) => {
+                const input = document.getElementById(`q-${qIndex}`);
+                const userAnswer = input.value.trim().toLowerCase();
+                const correctAnswer = q.a.toLowerCase();
+                
+                const feedbackSpan = document.createElement('span');
+                
+                // Remove previous feedback
+                const existingFeedback = quizQuestions.querySelector(`#feedback-${qIndex}`);
+                if (existingFeedback) {
+                    existingFeedback.remove();
+                }
+
+                if (userAnswer.includes(correctAnswer)) {
+                    feedbackSpan.className = 'text-green-500 ml-2 font-bold';
+                    feedbackSpan.id = `feedback-${qIndex}`;
+                    feedbackSpan.textContent = '🥳 Correct!';
+                    correctCount++;
+                } else {
+                    feedbackSpan.className = 'text-red-500 ml-2 font-bold';
+                    feedbackSpan.id = `feedback-${qIndex}`;
+                    feedbackSpan.textContent = `😕 Incorrect. The correct answer is: ${q.a}`;
+                }
+                
+                input.parentElement.appendChild(feedbackSpan);
+            });
+
+            // Display overall score
+            const existingScore = quizQuestions.querySelector('#score-summary');
+            if (existingScore) {
+                existingScore.remove();
+            }
+
+            const scoreSummary = document.createElement('p');
+            scoreSummary.id = 'score-summary';
+            scoreSummary.className = 'text-center font-bold text-xl mt-6 text-purple-600';
+            scoreSummary.textContent = `You got ${correctCount} out of ${story.questions.length} questions correct! Great job! 🎉`;
+            
+            quizQuestions.insertAdjacentElement('afterend', scoreSummary);
+        }
+
+    </script>
+</body>
+</html>
